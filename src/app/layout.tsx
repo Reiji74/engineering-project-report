@@ -3,8 +3,8 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
-  title: "Roti Canai",
-  description: "Built with Rotican.ai",
+  title: "Fan Speed Control Project",
+  description: "Embedded system project documentation for DC motor speed controller",
 };
 
 export default function RootLayout({
