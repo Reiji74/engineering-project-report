@@ -5,7 +5,7 @@ import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Copy, Linkedin, Upload, MessageCircle } from "lucide-react"
+import { Copy, Linkedin, Upload, MessageCircle, Moon, Sun } from "lucide-react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 
@@ -111,11 +111,19 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
 }
 
 export default function Home() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  const [autoMode, setAutoMode] = useState(true)
   const [module, setModule] = useState("sensor")
   const [activeTab, setActiveTab] = useState("background")
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!autoMode) return;
+
     const updateThemeBasedOnTime = () => {
       const currentHour = new Date().getHours()
       // 7:00 AM to 6:59 PM is light mode (hours 7 through 18)
@@ -130,7 +138,7 @@ export default function Home() {
     // Re-check the time every 60 seconds
     const intervalId = setInterval(updateThemeBasedOnTime, 60000)
     return () => clearInterval(intervalId)
-  }, [setTheme])
+  }, [setTheme, autoMode])
 
   const objectives = [
     "Design and implement a DC motor speed controller using the NUCLEO-F401RE/F411RE board in the ARM Mbed environment.",
@@ -282,9 +290,27 @@ int main() {
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
 
-        <header className="mb-10">
-          <h1 className={`text-3xl font-semibold ${headingFont}`}>Fan Speed Controller</h1>
-          <p className="text-muted-foreground">Embedded system project documentation</p>
+        <header className="mb-10 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <h1 className={`text-3xl font-semibold ${headingFont}`}>Fan Speed Controller</h1>
+            <p className="text-muted-foreground">Embedded system project documentation</p>
+          </div>
+
+          {/* Manual Theme Toggle */}
+          {mounted && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 shrink-0"
+              onClick={() => {
+                setAutoMode(false) // Disable auto-mode on manual override
+                setTheme(theme === "dark" ? "light" : "dark")
+              }}
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === "dark" ? "Light Mode" : "Dark Mode"}
+            </Button>
+          )}
         </header>
 
         <div className="w-full">
