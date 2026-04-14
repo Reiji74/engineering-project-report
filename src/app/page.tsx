@@ -10,14 +10,24 @@ import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 
 const headingFont = "font-[Inter]"
 
-function SectionCard({ title, text, showImage = true, children }: { title: string; text?: string; showImage?: boolean; children?: React.ReactNode }) {
+function SectionCard({ title, text, showImage = true, children }: { title: string; text?: string | string[]; showImage?: boolean; children?: React.ReactNode }) {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
         <CardTitle className={`text-lg ${headingFont}`}>{title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {text && <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{text}</p>}
+        {text && (
+          Array.isArray(text) ? (
+            <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+              {text.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{text}</p>
+          )
+        )}
         {children}
         {showImage && (
           <div className="w-full aspect-video bg-muted border border-border rounded-md flex items-center justify-center">
@@ -103,7 +113,11 @@ export default function Home() {
   const [module, setModule] = useState("sensor")
   const [activeTab, setActiveTab] = useState("background")
 
-  const objectives = `Design and implement a DC motor speed controller using the NUCLEO board and ARM Mbed.`
+  const objectives = [
+    "Design and implement a DC motor speed controller using the NUCLEO-F401RE/F411RE board in the ARM Mbed environment.",
+    "Interface a Bourns 10K trimpot as an analog input for continuous motor speed adjustment via ADC and PWM output.",
+    "Demonstrate a functional fan speed control prototype that integrates hardware and software into a complete embedded system."
+  ]
 
   const problemStatements = [
     "Conventional motor control methods lack real-time feedback, making it difficult to maintain a desired speed under varying load conditions.",
@@ -127,6 +141,10 @@ export default function Home() {
     {
       title: "Thermal Constraints",
       text: "The L298N driver generates significant heat during prolonged operation at high currents, potentially requiring passive or active cooling to maintain stability."
+    },
+    {
+      title: "Power Supply Dependency",
+      text: "As the 12V battery discharges, the maximum achievable motor speed will decrease, as the system relies on the raw battery voltage for the power stage."
     }
   ]
 
@@ -140,8 +158,12 @@ export default function Home() {
 
   const aboutText = `This website was created as part of our final project for the Microprocessors & Computer Architecture course at Universiti Teknologi PETRONAS.`
 
-  const moduleDescriptions: Record<string, string> = {
-    sensor: "Reads analog voltage from potentiometer.",
+  const moduleDescriptions: Record<string, string | string[]> = {
+    sensor: [
+      "This module utilizes the ADC peripheral to sample the analog voltage from the potentiometer.",
+      "The raw 12-bit digital value (ranging from 0 to 4095) is read periodically to detect changes in the user's input.",
+      "The captured ADC values are used to update motor speed control in real time."
+    ],
     processing: "Converts ADC value to usable control signal.",
     control: "Adjusts PWM duty cycle.",
     display: "Handles display feedback."
@@ -316,7 +338,15 @@ int main() {
                       <SelectItem value="display">Display Handling</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-muted-foreground">{moduleDescriptions[module]}</p>
+                  {Array.isArray(moduleDescriptions[module]) ? (
+                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground mt-4">
+                      {(moduleDescriptions[module] as string[]).map((item, index) => (
+                        <li key={index}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground mt-4">{moduleDescriptions[module]}</p>
+                  )}
                 </SectionCard>
 
                 <SectionCard title="Code Snippets" showImage={false}>
