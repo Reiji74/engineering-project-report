@@ -40,48 +40,44 @@ function SectionCard({ title, text, showImage = true, children }: { title: strin
   )
 }
 
-function ProfileBox() {
-  const [image, setImage] = useState<string | null>(null)
+interface ProfileProps {
+  name: string;
+  role: string;
+  imagePath: string;
+  linkedinUrl?: string;
+  threadsUrl?: string;
+}
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = () => setImage(reader.result as string)
-    reader.readAsDataURL(file)
-  }
-
+function ProfileBox({ name, role, imagePath, linkedinUrl, threadsUrl }: ProfileProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-6 p-6 border border-border rounded-lg bg-card">
 
       <div className="flex flex-col items-center gap-2">
-        <div className="w-28 h-28 bg-muted border border-border rounded-md flex items-center justify-center overflow-hidden">
-          {image ? (
-            <img src={image} alt="profile" className="w-full h-full object-cover" />
+        <div className="w-28 h-28 bg-muted border border-border rounded-md flex items-center justify-center overflow-hidden shrink-0">
+          {imagePath ? (
+            <img src={imagePath} alt={name} className="w-full h-full object-cover" />
           ) : (
             <span className="text-xs text-muted-foreground">Image</span>
           )}
         </div>
-
-        <label className="cursor-pointer text-sm text-primary flex items-center gap-1">
-          <Upload className="w-4 h-4" /> Upload
-          <input type="file" accept="image/*" className="hidden" onChange={handleUpload} />
-        </label>
       </div>
 
       <div className="flex flex-col justify-center gap-2">
-        <h3 className={`text-lg font-semibold ${headingFont}`}>Name</h3>
-        <p className="text-sm text-muted-foreground">Role</p>
+        <h3 className={`text-lg font-semibold ${headingFont}`}>{name}</h3>
+        <p className="text-sm text-muted-foreground">{role}</p>
 
         <div className="flex gap-4 pt-2">
-          <a href="#" className="flex items-center gap-1 text-primary hover:underline text-sm">
-            <Linkedin className="w-4 h-4" /> LinkedIn
-          </a>
+          {linkedinUrl && (
+            <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline text-sm">
+              <Linkedin className="w-4 h-4" /> LinkedIn
+            </a>
+          )}
 
-          <a href="#" className="flex items-center gap-1 text-primary hover:underline text-sm">
-            <MessageCircle className="w-4 h-4" /> Threads
-          </a>
+          {threadsUrl && (
+            <a href={threadsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline text-sm">
+              <MessageCircle className="w-4 h-4" /> Threads
+            </a>
+          )}
         </div>
       </div>
 
