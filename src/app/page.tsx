@@ -75,7 +75,7 @@ function ProfileBox({ name, role, imagePath, linkedinUrl, email }: ProfileProps)
 
           {email && (
             <a href={`mailto:${email}`} className="flex items-center gap-1 text-primary hover:underline text-sm">
-              <Mail className="w-4 h-4" /> Email
+              <Mail className="w-4 h-4" /> {email}
             </a>
           )}
         </div>
@@ -488,9 +488,9 @@ int main() {
                   <ProfileBox 
                     name="Muhammad Danish Iman Bin Sufian" 
                     role="Website Developer" 
-                    imagePath="/IMG_8641.jpg" 
+                    imagePath="/IMG_8641.JPG" 
                     linkedinUrl="https://www.linkedin.com/in/muhammad-danish-iman-sufian-9829b4291" 
-                    email="danish@example.com" 
+                    email="danishimansufian74@example.com" 
                   />
                   <ProfileBox 
                     name="Hemraaj A/L Rajamohan" 
