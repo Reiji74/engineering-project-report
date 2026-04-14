@@ -164,9 +164,18 @@ export default function Home() {
       "The raw 12-bit digital value (ranging from 0 to 4095) is read periodically to detect changes in the user's input.",
       "The captured ADC values are used to update motor speed control in real time."
     ],
-    processing: "Converts ADC value to usable control signal.",
-    control: "Adjusts PWM duty cycle.",
-    display: "Handles display feedback."
+    processing: [
+      "The raw ADC data is scaled or mapped to a float value between 0.0 and 1.0, representing the PWM duty cycle.",
+      "It also calculates the corresponding \"estimated voltage\" based on the 12V supply for the display output."
+    ],
+    control: [
+      "This module manages the PWM generation (frequency and duty cycle) sent to the L298N driver.",
+      "It includes the directional logic (setting GPIO pins high/low) to ensure the motor spins in the intended direction."
+    ],
+    display: [
+      "Using the I2C protocol, this module formats and sends strings to the 0.96\" OLED.",
+      "It refreshes the screen to show real-time metrics such as the current speed percentage and the calculated motor voltage."
+    ]
   }
 
   const codeSnippet = `#include "mbed.h"
