@@ -222,6 +222,39 @@ export default function Home() {
 
   const achievements = `Successfully demonstrated real-time fan speed control using embedded firmware.`
 
+  const futureImprovements = [
+    {
+      category: "Control & Sensing",
+      items: [
+        "Add a temperature sensor (e.g. LM35 or DHT11) so the fan speed adjusts automatically based on room temperature — making it a proper smart fan.",
+        "Implement PID control instead of direct PWM mapping for smoother, more stable speed regulation.",
+        "Add RPM sensing using a hall effect sensor or IR sensor to measure actual motor speed, not just the pot position."
+      ]
+    },
+    {
+      category: "User Interface",
+      items: [
+        "Replace the trimpot with push buttons to set speed in defined steps (e.g. Low / Medium / High).",
+        "Show actual RPM on the OLED instead of just a percentage.",
+        "Add a temperature reading to the OLED display if a sensor is added."
+      ]
+    },
+    {
+      category: "Connectivity",
+      items: [
+        "Integrate the ESP8266 WiFi module to enable remote speed control via a web browser or phone.",
+        "Log speed data over time and send it to a cloud dashboard like ThingSpeak."
+      ]
+    },
+    {
+      category: "Hardware",
+      items: [
+        "Add a flyback diode across the motor terminals to protect the L298N from voltage spikes.",
+        "Use a MOSFET-based driver instead of the L298N for higher efficiency at higher speeds."
+      ]
+    }
+  ]
+
   const aboutText = `This website was created as part of our final project for the Microprocessors & Computer Architecture course at Universiti Teknologi PETRONAS.`
 
   const moduleDescriptions: Record<string, string | string[]> = {
@@ -477,7 +510,25 @@ int main() {
 
             {activeTab === "next" && (
               <>
-                <SectionCard title="Future Improvements" text="Further enhancements can include wireless control." showImage={false} />
+                <SectionCard title="Future Improvements" showImage={false}>
+                  <div className="space-y-3">
+                    {futureImprovements.map((section, i) => (
+                      <details key={i} className="group border border-border rounded-md overflow-hidden">
+                        <summary className="p-3 font-medium cursor-pointer flex justify-between items-center list-none bg-muted/50 hover:bg-muted transition-colors [&::-webkit-details-marker]:hidden">
+                          {section.category}
+                          <ChevronDown className="w-4 h-4 text-muted-foreground group-open:rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-4 bg-background border-t border-border">
+                          <ul className="list-disc pl-5 space-y-2 text-muted-foreground text-sm">
+                            {section.items.map((item, j) => (
+                              <li key={j}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </SectionCard>
               </>
             )}
 
