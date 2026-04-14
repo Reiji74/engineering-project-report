@@ -5,7 +5,7 @@ import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Copy, Linkedin, Upload, MessageCircle, ChevronDown, Moon, Sun } from "lucide-react"
+import { Copy, Linkedin, MessageCircle, ChevronDown, Moon, Sun } from "lucide-react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 
@@ -489,8 +489,20 @@ int main() {
               <>
                 <SectionCard title="About This Website" text={aboutText} showImage={false} />
                 <div className="grid md:grid-cols-2 gap-6">
-                  <ProfileBox />
-                  <ProfileBox />
+                  <ProfileBox 
+                    name="Your Name" 
+                    role="Lead Developer" 
+                    imagePath="/profile1.jpg" 
+                    linkedinUrl="#" 
+                    threadsUrl="#" 
+                  />
+                  <ProfileBox 
+                    name="Partner Name" 
+                    role="Hardware Engineer" 
+                    imagePath="/profile2.jpg" 
+                    linkedinUrl="#" 
+                    threadsUrl="#" 
+                  />
                 </div>
               </>
             )}
