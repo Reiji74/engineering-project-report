@@ -1,4 +1,4 @@
-# Rotican.ai Next.js Starter
+# fan speed control report
 
 Next.js 16 + Tailwind v4 + shadcn/ui starter template.
 
