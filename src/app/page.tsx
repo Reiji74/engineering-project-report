@@ -486,16 +486,16 @@ int main() {
                 <SectionCard title="About This Website" text={aboutText} showImage={false} />
                 <div className="grid md:grid-cols-2 gap-6">
                   <ProfileBox 
-                    name="Your Name" 
+                    name="John Doe" 
                     role="Lead Developer" 
-                    imagePath="/profile1.jpg" 
-                    linkedinUrl="#" 
+                    imagePath="/my-photo.jpg" 
+                    linkedinUrl="https://linkedin.com/in/yourprofile" 
                     threadsUrl="#" 
                   />
                   <ProfileBox 
-                    name="Partner Name" 
+                    name="Jane Smith" 
                     role="Hardware Engineer" 
-                    imagePath="/profile2.jpg" 
+                    imagePath="/partner-photo.png" 
                     linkedinUrl="#" 
                     threadsUrl="#" 
                   />
