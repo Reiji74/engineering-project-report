@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Copy, Linkedin, Upload, MessageCircle } from "lucide-react"
+import { Copy, Linkedin, Upload, MessageCircle, ChevronDown } from "lucide-react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 
@@ -150,7 +150,50 @@ export default function Home() {
 
   const interfacingText = `Hardware components communicate through ADC, PWM, and I2C interfaces.`
 
-  const testingProcedures = `The system was tested by adjusting the trimpot and observing motor speed.`
+  const testingProcedures = [
+    {
+      stage: "Stage 1 — Hardware verification",
+      steps: [
+        "Verified all wiring connections against the circuit diagram before powering on — checking GND common, ENA jumper removal, and motor terminals.",
+        "Confirmed the 12V battery supply to the L298N EXT_PWR pin using a multimeter.",
+        "Checked that the trimpot wiper (middle pin) correctly outputs 0–3.3V as the knob is turned, measured at PA_0 on the NUCLEO board.",
+        "Confirmed the OLED display powers on and initialises correctly when the NUCLEO is connected via USB."
+      ]
+    },
+    {
+      stage: "Stage 2 — Firmware & PWM testing",
+      steps: [
+        "Flashed the firmware onto the NUCLEO-F401RE using Keil Studio and verified a successful build with no errors.",
+        "Turned the trimpot slowly from minimum to maximum and observed the PWM duty cycle increasing proportionally, confirmed by the motor speed change.",
+        "Tested the dead zone threshold — confirmed motor remains stopped when pot reading is below 10%, as defined in the control logic.",
+        "Verified the PWM frequency of 100 Hz (period = 0.01s) is within the acceptable operating range for the L298N motor driver."
+      ]
+    },
+    {
+      stage: "Stage 3 — LED indicator testing",
+      steps: [
+        "Confirmed that both LEDs remain off when pot reading is below 10% (motor stopped state).",
+        "Verified the blue LED (PA_5) lights up correctly when speed is between 10% and 69%.",
+        "Verified the yellow LED (PA_6) switches on when speed reaches 70% and above, with the blue LED turning off simultaneously."
+      ]
+    },
+    {
+      stage: "Stage 4 — OLED display testing",
+      steps: [
+        "Confirmed the OLED correctly displays the speed percentage in real time as the trimpot is adjusted.",
+        "Checked that the status text updates correctly — showing \"STOPPED\", \"NORMAL\", or \"HIGH SPEED!\" based on the current pot position.",
+        "Verified the screen refreshes smoothly every 100ms without visible flickering during normal operation."
+      ]
+    },
+    {
+      stage: "Stage 5 — Full system integration test",
+      steps: [
+        "Ran the complete system with all components connected — trimpot, L298N, DC motor, LEDs, and OLED — simultaneously.",
+        "Swept the trimpot from 0% to 100% multiple times and confirmed all outputs — motor speed, LED state, and OLED display — responded consistently and correctly.",
+        "Observed the system continuously for several minutes to check for overheating, signal instability, or unexpected resets."
+      ]
+    }
+  ]
 
   const observedOutput = `Motor speed changed smoothly according to potentiometer position.`
 
@@ -366,7 +409,26 @@ int main() {
 
             {activeTab === "outcomes" && (
               <>
-                <SectionCard title="Testing Procedures" text={testingProcedures} showImage={false} />
+                <SectionCard title="Testing Procedures" showImage={false}>
+                  <div className="space-y-3">
+                    {testingProcedures.map((stage, i) => (
+                      <details key={i} className="group border border-border rounded-md overflow-hidden">
+                        <summary className="p-3 font-medium cursor-pointer flex justify-between items-center list-none bg-muted/50 hover:bg-muted transition-colors [&::-webkit-details-marker]:hidden">
+                          {stage.stage}
+                          <ChevronDown className="w-4 h-4 text-muted-foreground group-open:rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-4 bg-background border-t border-border">
+                          <ol className="list-decimal pl-5 space-y-2 text-muted-foreground text-sm">
+                            {stage.steps.map((step, j) => (
+                              <li key={j}>{step}</li>
+                            ))}
+                          </ol>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </SectionCard>
+
                 <SectionCard title="Observed Output" text={observedOutput} />
                 <SectionCard title="Project Achievements" text={achievements} showImage={false} />
               </>
