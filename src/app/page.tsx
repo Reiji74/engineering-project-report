@@ -221,8 +221,6 @@ export default function Home() {
     }
   ]
 
-  const observedOutput = `Motor speed changed smoothly according to potentiometer position.`
-
   const achievements = `Successfully demonstrated real-time fan speed control using embedded firmware.`
 
   const futureImprovements = [
@@ -477,7 +475,15 @@ int main() {
                     />
                   </div>
                 </SectionCard>
-                <SectionCard title="Hardware Architecture" />
+                <SectionCard title="Program Flowchart" showImage={false}>
+                  <div className="w-full rounded-md overflow-hidden border border-border bg-white p-4 flex items-center justify-center mt-4">
+                    <img 
+                      src="/program_flowchart_motor_controller.svg" 
+                      alt="Program Flowchart" 
+                      className="w-full max-w-3xl h-auto"
+                    />
+                  </div>
+                </SectionCard>
                 <SectionCard title="Hardware Interfacing" text={interfacingText} showImage={false} />
               </>
             )}
@@ -535,7 +541,15 @@ int main() {
                   </div>
                 </SectionCard>
 
-                <SectionCard title="Observed Output" text={observedOutput} />
+                <SectionCard title="The results" showImage={false}>
+                  <div className="w-full rounded-md overflow-hidden border border-border flex items-center justify-center mt-2">
+                    <img 
+                      src="/output.jpg" 
+                      alt="The results" 
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </SectionCard>
                 <SectionCard title="Project Achievements" text={achievements} showImage={false} />
               </>
             )}
