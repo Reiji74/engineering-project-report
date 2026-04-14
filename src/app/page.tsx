@@ -260,6 +260,17 @@ export default function Home() {
 
   const aboutText = `This website was created as part of our final project for the Microprocessors & Computer Architecture course at Universiti Teknologi PETRONAS.`
 
+  const hardwareComponents = [
+    "NUCLEO-F411RE Development Board",
+    "L298N Motor Driver Module",
+    "DC Motor",
+    "10kΩ Potentiometer",
+    "0.96\" OLED Display",
+    "12V Battery Pack",
+    "Jumper Wires",
+    "Breadboard"
+  ]
+
   const moduleDescriptions: Record<string, string | string[]> = {
     sensor: [
       "This module utilizes the ADC peripheral to sample the analog voltage from the potentiometer.",
@@ -447,6 +458,16 @@ int main() {
 
             {activeTab === "hardware" && (
               <>
+                <SectionCard title="List of Components" showImage={false}>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
+                    {hardwareComponents.map((component, index) => (
+                      <div key={index} className="flex items-center justify-center text-center p-4 border border-border rounded-lg bg-muted/30 hover:bg-muted/60 transition-colors shadow-sm cursor-default">
+                        <span className="text-sm font-medium text-foreground">{component}</span>
+                      </div>
+                    ))}
+                  </div>
+                </SectionCard>
+
                 <SectionCard title="Block Diagram" showImage={false}>
                   <div className="w-full rounded-md overflow-hidden border border-border bg-white p-4 flex items-center justify-center mt-4">
                     <img 
