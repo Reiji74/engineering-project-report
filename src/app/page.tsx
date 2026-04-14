@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Copy, Linkedin, Mail, ChevronDown, Moon, Sun } from "lucide-react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { Space_Mono } from "next/font/google"
+
+const spaceMono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"] })
 
 const headingFont = "font-[Inter]"
 
@@ -364,7 +367,7 @@ int main() {
 
         <header className="mb-10 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <h1 className={`text-3xl font-semibold ${headingFont}`}>Fan Speed Controller</h1>
+            <h1 className={`text-3xl font-bold ${spaceMono.className}`}>Fan Speed Controller</h1>
             <p className="text-muted-foreground">Embedded system project documentation</p>
           </div>
 
@@ -404,7 +407,7 @@ int main() {
                   setActiveTab(tab.id)
                 }}
                 type="button"
-                className={`px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer ${
+            className={`px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer ${spaceMono.className} ${
                   activeTab === tab.id
                     ? "bg-background text-foreground"
                     : "text-muted-foreground hover:text-foreground"
