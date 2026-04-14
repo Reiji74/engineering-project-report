@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -110,8 +111,26 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
 }
 
 export default function Home() {
+  const { setTheme } = useTheme()
   const [module, setModule] = useState("sensor")
   const [activeTab, setActiveTab] = useState("background")
+
+  useEffect(() => {
+    const updateThemeBasedOnTime = () => {
+      const currentHour = new Date().getHours()
+      // 7:00 AM to 6:59 PM is light mode (hours 7 through 18)
+      if (currentHour >= 7 && currentHour < 19) {
+        setTheme("light")
+      } else {
+        setTheme("dark")
+      }
+    }
+
+    updateThemeBasedOnTime()
+    // Re-check the time every 60 seconds
+    const intervalId = setInterval(updateThemeBasedOnTime, 60000)
+    return () => clearInterval(intervalId)
+  }, [setTheme])
 
   const objectives = [
     "Design and implement a DC motor speed controller using the NUCLEO-F401RE/F411RE board in the ARM Mbed environment.",
