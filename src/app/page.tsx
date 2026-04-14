@@ -5,7 +5,7 @@ import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Copy, Linkedin, MessageCircle, ChevronDown, Moon, Sun } from "lucide-react"
+import { Copy, Linkedin, Mail, ChevronDown, Moon, Sun } from "lucide-react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 
@@ -45,10 +45,10 @@ interface ProfileProps {
   role: string;
   imagePath: string;
   linkedinUrl?: string;
-  threadsUrl?: string;
+  email?: string;
 }
 
-function ProfileBox({ name, role, imagePath, linkedinUrl, threadsUrl }: ProfileProps) {
+function ProfileBox({ name, role, imagePath, linkedinUrl, email }: ProfileProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-6 p-6 border border-border rounded-lg bg-card">
 
@@ -73,9 +73,9 @@ function ProfileBox({ name, role, imagePath, linkedinUrl, threadsUrl }: ProfileP
             </a>
           )}
 
-          {threadsUrl && (
-            <a href={threadsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline text-sm">
-              <MessageCircle className="w-4 h-4" /> Threads
+          {email && (
+            <a href={`mailto:${email}`} className="flex items-center gap-1 text-primary hover:underline text-sm">
+              <Mail className="w-4 h-4" /> Email
             </a>
           )}
         </div>
@@ -486,18 +486,18 @@ int main() {
                 <SectionCard title="About This Website" text={aboutText} showImage={false} />
                 <div className="grid md:grid-cols-2 gap-6">
                   <ProfileBox 
-                    name="John Doe" 
-                    role="Lead Developer" 
-                    imagePath="/my-photo.jpg" 
-                    linkedinUrl="https://linkedin.com/in/yourprofile" 
-                    threadsUrl="#" 
+                    name="Muhammad Danish Iman Bin Sufian" 
+                    role="Website Developer" 
+                    imagePath="/IMG_8641.jpg" 
+                    linkedinUrl="https://www.linkedin.com/in/muhammad-danish-iman-sufian-9829b4291" 
+                    email="danish@example.com" 
                   />
                   <ProfileBox 
-                    name="Jane Smith" 
+                    name="Hemraaj A/L Rajamohan" 
                     role="Hardware Engineer" 
-                    imagePath="/partner-photo.png" 
+                    imagePath="/web_image.jpeg" 
                     linkedinUrl="#" 
-                    threadsUrl="#" 
+                    email="hemraaj@example.com" 
                   />
                 </div>
               </>
