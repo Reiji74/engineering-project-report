@@ -444,7 +444,15 @@ int main() {
 
             {activeTab === "hardware" && (
               <>
-                <SectionCard title="Block Diagram" />
+                <SectionCard title="Block Diagram" showImage={false}>
+                  <div className="w-full rounded-md overflow-hidden border border-border bg-white p-4 flex items-center justify-center mt-4">
+                    <img 
+                      src="/block_diagram_motor_speed_controller.svg" 
+                      alt="Motor Speed Controller Block Diagram" 
+                      className="w-full max-w-3xl h-auto"
+                    />
+                  </div>
+                </SectionCard>
                 <SectionCard title="Hardware Architecture" />
                 <SectionCard title="Hardware Interfacing" text={interfacingText} showImage={false} />
               </>
@@ -541,14 +549,13 @@ int main() {
                     role="Website Developer" 
                     imagePath="/IMG_8641.JPG" 
                     linkedinUrl="https://www.linkedin.com/in/muhammad-danish-iman-sufian-9829b4291" 
-                    email="danishimansufian74@example.com" 
+                    email="danishimansufian74@gmail.com" 
                   />
                   <ProfileBox 
                     name="Hemraaj A/L Rajamohan" 
                     role="Hardware Engineer" 
                     imagePath="/web_image.jpeg" 
-                    linkedinUrl="#" 
-                    email="hemraaj@example.com" 
+                    email="hemraaj_22006512@utp.edu.my" 
                   />
                 </div>
               </>
