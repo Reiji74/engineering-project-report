@@ -544,7 +544,7 @@ int main() {
                 <SectionCard title="The results" showImage={false}>
                   <div className="w-full rounded-md overflow-hidden border border-border flex items-center justify-center mt-2">
                     <img 
-                      src="/output.jpg" 
+                      src="/output.jpeg" 
                       alt="The results" 
                       className="w-full h-auto"
                     />
