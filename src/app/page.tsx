@@ -58,7 +58,13 @@ function ProfileBox({ name, role, imagePath, linkedinUrl, email }: ProfileProps)
       <div className="flex flex-col items-center gap-2">
         <div className="w-28 h-28 bg-muted border border-border rounded-md flex items-center justify-center overflow-hidden shrink-0">
           {imagePath ? (
-            <img src={imagePath} alt={name} className="w-full h-full object-cover" />
+            <img 
+              src={imagePath} 
+              alt={name} 
+              className="w-full h-full object-cover pointer-events-none select-none" 
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+            />
           ) : (
             <span className="text-xs text-muted-foreground">Image</span>
           )}
@@ -265,7 +271,9 @@ export default function Home() {
     }
   ]
 
-  const aboutText = `This website was created as part of our final project for the Microprocessors & Computer Architecture course at Universiti Teknologi PETRONAS.`
+  const aboutText = platform === "stm32" 
+    ? `This website was created as part of our final project for the Microprocessors & Computer Architecture course at Universiti Teknologi PETRONAS.`
+    : `The ESP32 version of this system is a personal side project, designed to adapt the original STM32 motor control logic into the Arduino and PlatformIO ecosystem.`
 
   const hardwareComponents = [
     platform === "stm32" ? "NUCLEO-F411RE Development Board" : "ESP32 Development Board",
@@ -379,84 +387,91 @@ int main() {
     }
 }`
 
-  const codeSnippetESP32 = `#include <Wire.h>
+  const codeSnippetESP32 = `#include <Arduino.h>
+#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// ==========================================
-// 1. I2C & OLED Display Setup
-// ==========================================
+// ---- OLED Setup ----
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-// ==========================================
-// 2. Pin Definitions
-// ==========================================
-const int potPin = 34;       // Analog input for Potentiometer
-const int motorPin = 18;     // PWM output to ENA
-const int motorDir1 = 19;    // Direction 1 to IN1
-const int motorDir2 = 21;    // Direction 2 to IN2
-const int ledBlue = 25;      // Normal Speed LED
-const int ledYellow = 26;    // High Speed LED
+// ---- Pin Definitions ----
+#define IN1     27
+#define IN2     26
+#define ENA     14
+#define POT_PIN 34
 
-// PWM Properties
-const int freq = 100;
-const int pwmChannel = 0;
-const int resolution = 8;    // 8-bit resolution (0-255)
+// ---- PWM Setup ----
+#define PWM_CHANNEL   0
+#define PWM_FREQ      1000   // 1kHz
+#define PWM_RESOLUTION 8     // 8-bit = 0 to 255
 
 void setup() {
-  pinMode(motorDir1, OUTPUT);
-  pinMode(motorDir2, OUTPUT);
-  pinMode(ledBlue, OUTPUT);
-  pinMode(ledYellow, OUTPUT);
-  
-  // Set motor direction
-  digitalWrite(motorDir1, HIGH);
-  digitalWrite(motorDir2, LOW);
-  
-  // Configure PWM
-  ledcSetup(pwmChannel, freq, resolution);
-  ledcAttachPin(motorPin, pwmChannel);
-  
-  // Initialize OLED
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  Serial.begin(115200);
+
+  // Motor pins
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+
+  // Set motor direction (forward)
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  // PWM setup
+  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttachPin(ENA, PWM_CHANNEL);
+
+  // OLED init
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("OLED not found!");
+    while (true);
+  }
   display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.println("Motor Speed Control");
   display.display();
+  delay(1500);
 }
 
 void loop() {
-  int potValue = analogRead(potPin); // 0-4095
-  float currentSpeed = potValue / 4095.0;
-  int dutyCycle = currentSpeed * 255;
-  
-  ledcWrite(pwmChannel, dutyCycle);
-  
-  // Reset LEDs
-  digitalWrite(ledBlue, LOW);
-  digitalWrite(ledYellow, LOW);
-  
-  // Update Display
+  // Read potentiometer (0 - 4095)
+  int potValue = analogRead(POT_PIN);
+
+  // Map to PWM duty cycle (0 - 255)
+  int pwmValue = map(potValue, 0, 4095, 0, 255);
+
+  // Map to percentage for display (0 - 100%)
+  int speedPercent = map(potValue, 0, 4095, 0, 100);
+
+  // Apply PWM to motor
+  ledcWrite(PWM_CHANNEL, pwmValue);
+
+  // Update OLED
   display.clearDisplay();
+
+  display.setTextSize(1);
   display.setCursor(0, 0);
-  display.setTextColor(WHITE);
-  display.println("ESP32 Motor Control");
-  display.println("-------------------");
-  
-  int speedPercent = currentSpeed * 100;
-  display.printf("Speed: %d %%\n\n", speedPercent);
-  
-  if (currentSpeed < 0.1) {
-    display.println("Status: STOPPED");
-  } else if (currentSpeed >= 0.1 && currentSpeed < 0.7) {
-    digitalWrite(ledBlue, HIGH);
-    display.println("Status: NORMAL");
-  } else {
-    digitalWrite(ledYellow, HIGH);
-    display.println("Status: HIGH SPEED!");
-  }
-  
+  display.println("  Motor Speed Control");
+  display.drawLine(0, 10, 127, 10, SSD1306_WHITE);
+
+  display.setTextSize(2);
+  display.setCursor(30, 20);
+  display.print(speedPercent);
+  display.print(" %");
+
+  display.setTextSize(1);
+  display.setCursor(0, 48);
+  display.print("PWM: ");
+  display.print(pwmValue);
+  display.print("  RAW: ");
+  display.print(potValue);
+
   display.display();
+
   delay(100);
 }`
 
@@ -691,20 +706,22 @@ void loop() {
             {activeTab === "about" && (
               <>
                 <SectionCard title="About This Website" text={aboutText} showImage={false} />
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className={`grid gap-6 ${platform === "stm32" ? "md:grid-cols-2" : "md:grid-cols-1 max-w-2xl"}`}>
                   <ProfileBox 
                     name="Muhammad Danish Iman Bin Sufian" 
-                    role="Website Developer" 
+                    role={platform === "stm32" ? "Website Developer" : "Project Developer"} 
                     imagePath="/IMG_8641.JPG" 
                     linkedinUrl="https://www.linkedin.com/in/muhammad-danish-iman-sufian-9829b4291" 
                     email="danishimansufian74@gmail.com" 
                   />
-                  <ProfileBox 
-                    name="Hemraaj A/L Rajamohan" 
-                    role="Hardware Engineer" 
-                    imagePath="/web_image.jpeg" 
-                    email="hemraaj_22006512@utp.edu.my" 
-                  />
+                  {platform === "stm32" && (
+                    <ProfileBox 
+                      name="Hemraaj A/L Rajamohan" 
+                      role="Hardware Engineer" 
+                      imagePath="/web_image.jpeg" 
+                      email="hemraaj_22006512@utp.edu.my" 
+                    />
+                  )}
                 </div>
               </>
             )}
