@@ -115,6 +115,7 @@ export default function Home() {
   const [autoMode, setAutoMode] = useState(true)
   const [module, setModule] = useState("sensor")
   const [activeTab, setActiveTab] = useState("background")
+  const [platform, setPlatform] = useState<"stm32" | "esp32">("stm32")
 
   useEffect(() => {
     setMounted(true)
@@ -140,7 +141,9 @@ export default function Home() {
   }, [setTheme, autoMode])
 
   const objectives = [
-    "Design and implement a DC motor speed controller using the NUCLEO-F401RE/F411RE board in the ARM Mbed environment.",
+    platform === "stm32"
+      ? "Design and implement a DC motor speed controller using the NUCLEO-F401RE/F411RE board in the ARM Mbed environment."
+      : "Design and implement a DC motor speed controller using the ESP32 development board in the Arduino/PlatformIO environment.",
     "Interface a Bourns 10K trimpot as an analog input for continuous motor speed adjustment via ADC and PWM output.",
     "Demonstrate a functional fan speed control prototype that integrates hardware and software into a complete embedded system."
   ]
@@ -182,14 +185,20 @@ export default function Home() {
       steps: [
         "Verified all wiring connections against the circuit diagram before powering on — checking GND common, ENA jumper removal, and motor terminals.",
         "Confirmed the 12V battery supply to the L298N EXT_PWR pin using a multimeter.",
-        "Checked that the trimpot wiper (middle pin) correctly outputs 0–3.3V as the knob is turned, measured at PA_0 on the NUCLEO board.",
-        "Confirmed the OLED display powers on and initialises correctly when the NUCLEO is connected via USB."
+        platform === "stm32" 
+          ? "Checked that the trimpot wiper (middle pin) correctly outputs 0–3.3V as the knob is turned, measured at PA_0 on the NUCLEO board."
+          : "Checked that the trimpot wiper (middle pin) correctly outputs 0–3.3V as the knob is turned, measured at analog pin 34 on the ESP32 board.",
+        platform === "stm32"
+          ? "Confirmed the OLED display powers on and initialises correctly when the NUCLEO is connected via USB."
+          : "Confirmed the OLED display powers on and initialises correctly when the ESP32 is connected via USB."
       ]
     },
     {
       stage: "Stage 2 — Firmware & PWM testing",
       steps: [
-        "Flashed the firmware onto the NUCLEO-F401RE using Keil Studio and verified a successful build with no errors.",
+        platform === "stm32"
+          ? "Flashed the firmware onto the NUCLEO-F401RE using Keil Studio and verified a successful build with no errors."
+          : "Flashed the firmware onto the ESP32 using Arduino IDE/PlatformIO and verified a successful build with no errors.",
         "Turned the trimpot slowly from minimum to maximum and observed the PWM duty cycle increasing proportionally, confirmed by the motor speed change.",
         "Tested the dead zone threshold — confirmed motor remains stopped when pot reading is below 10%, as defined in the control logic.",
         "Verified the PWM frequency of 100 Hz (period = 0.01s) is within the acceptable operating range for the L298N motor driver."
@@ -259,7 +268,7 @@ export default function Home() {
   const aboutText = `This website was created as part of our final project for the Microprocessors & Computer Architecture course at Universiti Teknologi PETRONAS.`
 
   const hardwareComponents = [
-    "NUCLEO-F411RE Development Board",
+    platform === "stm32" ? "NUCLEO-F411RE Development Board" : "ESP32 Development Board",
     "L298N Motor Driver Module",
     "DC Motor",
     "10kΩ Potentiometer",
@@ -289,7 +298,7 @@ export default function Home() {
     ]
   }
 
-  const codeSnippet = `#include "mbed.h"
+  const codeSnippetSTM32 = `#include "mbed.h"
 #include "Adafruit_SSD1306.h" // Must be added to your Keil Studio project!
 
 // ==========================================
@@ -370,6 +379,89 @@ int main() {
     }
 }`
 
+  const codeSnippetESP32 = `#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+// ==========================================
+// 1. I2C & OLED Display Setup
+// ==========================================
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+// ==========================================
+// 2. Pin Definitions
+// ==========================================
+const int potPin = 34;       // Analog input for Potentiometer
+const int motorPin = 18;     // PWM output to ENA
+const int motorDir1 = 19;    // Direction 1 to IN1
+const int motorDir2 = 21;    // Direction 2 to IN2
+const int ledBlue = 25;      // Normal Speed LED
+const int ledYellow = 26;    // High Speed LED
+
+// PWM Properties
+const int freq = 100;
+const int pwmChannel = 0;
+const int resolution = 8;    // 8-bit resolution (0-255)
+
+void setup() {
+  pinMode(motorDir1, OUTPUT);
+  pinMode(motorDir2, OUTPUT);
+  pinMode(ledBlue, OUTPUT);
+  pinMode(ledYellow, OUTPUT);
+  
+  // Set motor direction
+  digitalWrite(motorDir1, HIGH);
+  digitalWrite(motorDir2, LOW);
+  
+  // Configure PWM
+  ledcSetup(pwmChannel, freq, resolution);
+  ledcAttachPin(motorPin, pwmChannel);
+  
+  // Initialize OLED
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.display();
+}
+
+void loop() {
+  int potValue = analogRead(potPin); // 0-4095
+  float currentSpeed = potValue / 4095.0;
+  int dutyCycle = currentSpeed * 255;
+  
+  ledcWrite(pwmChannel, dutyCycle);
+  
+  // Reset LEDs
+  digitalWrite(ledBlue, LOW);
+  digitalWrite(ledYellow, LOW);
+  
+  // Update Display
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.setTextColor(WHITE);
+  display.println("ESP32 Motor Control");
+  display.println("-------------------");
+  
+  int speedPercent = currentSpeed * 100;
+  display.printf("Speed: %d %%\n\n", speedPercent);
+  
+  if (currentSpeed < 0.1) {
+    display.println("Status: STOPPED");
+  } else if (currentSpeed >= 0.1 && currentSpeed < 0.7) {
+    digitalWrite(ledBlue, HIGH);
+    display.println("Status: NORMAL");
+  } else {
+    digitalWrite(ledYellow, HIGH);
+    display.println("Status: HIGH SPEED!");
+  }
+  
+  display.display();
+  delay(100);
+}`
+
+  const activeCodeSnippet = platform === "stm32" ? codeSnippetSTM32 : codeSnippetESP32;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
@@ -378,6 +470,23 @@ int main() {
           <div>
             <h1 className={`text-3xl font-bold ${spaceMono.className}`}>Fan Speed Controller Project</h1>
             <p className="text-muted-foreground">Embedded system project documentation</p>
+          </div>
+
+        <div className="flex items-center gap-4 mt-4 sm:mt-0">
+          {/* Platform Toggle */}
+          <div className="flex bg-muted/50 p-1 rounded-lg border border-border shrink-0">
+            <button 
+              onClick={() => setPlatform("stm32")}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${platform === "stm32" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              STM32
+            </button>
+            <button 
+              onClick={() => setPlatform("esp32")}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${platform === "esp32" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              ESP32
+            </button>
           </div>
 
           {/* Manual Theme Toggle */}
@@ -395,6 +504,7 @@ int main() {
               {theme === "dark" ? "Light Mode" : "Dark Mode"}
             </Button>
           )}
+        </div>
         </header>
 
         <div className="w-full">
@@ -514,7 +624,7 @@ int main() {
                 </SectionCard>
 
                 <SectionCard title="Code Snippets" showImage={false}>
-                  <CodeBlock language="C++" code={codeSnippet} />
+              <CodeBlock language="C++" code={activeCodeSnippet} />
                 </SectionCard>
               </>
             )}
